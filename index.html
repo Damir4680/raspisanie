@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Мой распорядок</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="topbar">
+
+    <div>
+        <h1>Мой распорядок</h1>
+        <p id="currentDateText"></p>
+    </div>
+
+    <div class="top-actions">
+        <button id="themeButton" class="icon-button">🌙</button>
+        <button id="notificationButton" class="icon-button">🔔</button>
+    </div>
+
+</header>
+
+
+<main class="container">
+
+    <!-- НАВИГАЦИЯ -->
+
+    <section class="date-navigation">
+
+        <button id="previousDay">←</button>
+
+        <button id="todayButton">
+            Сегодня
+        </button>
+
+        <input
+            type="date"
+            id="datePicker"
+        >
+
+        <button id="nextDay">→</button>
+
+        <button id="weekViewButton">
+            📅 Неделя
+        </button>
+
+    </section>
+
+
+    <!-- СТАТИСТИКА -->
+
+    <section class="stats">
+
+        <div class="stat-card">
+            <span>Задач</span>
+            <strong id="totalTasks">0</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Выполнено</span>
+            <strong id="completedTasks">0</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Прогресс</span>
+            <strong id="progressText">0%</strong>
+        </div>
+
+        <div class="stat-card">
+            <span>Серия</span>
+            <strong id="streakText">0 🔥</strong>
+        </div>
+
+    </section>
+
+
+    <section>
+
+        <div class="progress-bar">
+            <div id="progressBar"></div>
+        </div>
+
+    </section>
+
+
+    <!-- КНОПКИ -->
+
+    <section class="controls">
+
+        <button id="addTaskButton">
+            ➕ Добавить дело
+        </button>
+
+        <button id="goalsButton">
+            🎯 Цели
+        </button>
+
+        <button id="eisenhowerButton">
+            🧩 Матрица
+        </button>
+
+        <button id="notesButton">
+            📝 Заметки
+        </button>
+
+        <button id="monthStatsButton">
+            📊 Статистика месяца
+        </button>
+
+        <button id="copyDayButton">
+            📋 Копировать день
+        </button>
+
+        <button id="exportButton">
+            📤 Экспорт
+        </button>
+
+        <button id="importButton">
+            📥 Импорт
+        </button>
+
+        <button id="clearDayButton" class="danger">
+            🗑 Очистить день
+        </button>
+
+        <input
+            type="file"
+            id="importFile"
+            accept=".json"
+            hidden
+        >
+
+    </section>
+
+
+    <!-- ПОИСК -->
+
+    <section class="search-section">
+
+        <input
+            type="search"
+            id="searchInput"
+            placeholder="🔍 Поиск задач..."
+        >
+
+        <select id="categoryFilter">
+
+            <option value="all">
+                Все категории
+            </option>
+
+            <option value="study">
+                📚 Учёба
+            </option>
+
+            <option value="work">
+                💼 Работа
+            </option>
+
+            <option value="sport">
+                🏃 Спорт
+            </option>
+
+            <option value="rest">
+                🎮 Отдых
+            </option>
+
+            <option value="other">
+                📌 Другое
+            </option>
+
+        </select>
+
+    </section>
+
+
+    <!-- НЕДЕЛЯ -->
+
+    <section
+        id="weekView"
+        class="week-view hidden"
+    >
+        <div id="weekDays"></div>
+    </section>
+
+
+    <!-- РАСПИСАНИЕ -->
+
+    <section class="schedule-section">
+
+        <div class="schedule">
+
+            <div class="time-column">
+
+                <div>00:00</div>
+                <div>01:00</div>
+                <div>02:00</div>
+                <div>03:00</div>
+                <div>04:00</div>
+                <div>05:00</div>
+                <div>06:00</div>
+                <div>07:00</div>
+                <div>08:00</div>
+                <div>09:00</div>
+                <div>10:00</div>
+                <div>11:00</div>
+                <div>12:00</div>
+                <div>13:00</div>
+                <div>14:00</div>
+                <div>15:00</div>
+                <div>16:00</div>
+                <div>17:00</div>
+                <div>18:00</div>
+                <div>19:00</div>
+                <div>20:00</div>
+                <div>21:00</div>
+                <div>22:00</div>
+                <div>23:00</div>
+
+            </div>
+
+            <div
+                id="timeline"
+                class="timeline"
+            ></div>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ===============================
+     ОКНО ЗАДАЧИ
+================================ -->
+
+<div id="taskModal" class="modal hidden">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2 id="modalTitle">
+                Новая задача
+            </h2>
+
+            <button id="closeModal">×</button>
+
+        </div>
+
+
+        <form id="taskForm">
+
+            <input type="hidden" id="taskId">
+
+            <label>
+                Название
+
+                <input
+                    type="text"
+                    id="taskTitle"
+                    required
+                >
+            </label>
+
+
+            <div class="two-columns">
+
+                <label>
+                    Начало
+
+                    <input
+                        type="time"
+                        id="startTime"
+                        required
+                    >
+                </label>
+
+                <label>
+                    Конец
+
+                    <input
+                        type="time"
+                        id="endTime"
+                        required
+                    >
+                </label>
+
+            </div>
+
+
+            <label>
+                Категория
+
+                <select id="taskCategory">
+
+                    <option value="study">
+                        📚 Учёба
+                    </option>
+
+                    <option value="work">
+                        💼 Работа
+                    </option>
+
+                    <option value="sport">
+                        🏃 Спорт
+                    </option>
+
+                    <option value="rest">
+                        🎮 Отдых
+                    </option>
+
+                    <option value="other">
+                        📌 Другое
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label>
+                Приоритет
+
+                <select id="taskPriority">
+
+                    <option value="normal">
+                        Обычный
+                    </option>
+
+                    <option value="high">
+                        🔥 Высокий
+                    </option>
+
+                    <option value="low">
+                        Низкий
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label>
+                Описание
+
+                <textarea
+                    id="taskDescription"
+                ></textarea>
+            </label>
+
+
+            <label>
+                Теги
+
+                <input
+                    type="text"
+                    id="taskTags"
+                    placeholder="школа, важное, экзамен"
+                >
+            </label>
+
+
+            <label>
+                Повторение
+
+                <select id="repeatType">
+
+                    <option value="none">
+                        Не повторять
+                    </option>
+
+                    <option value="daily">
+                        Каждый день
+                    </option>
+
+                    <option value="weekdays">
+                        По будням
+                    </option>
+
+                    <option value="weekly">
+                        Каждую неделю
+                    </option>
+
+                </select>
+
+            </label>
+
+
+            <label>
+                Напоминание
+
+                <select id="reminderMinutes">
+
+                    <option value="0">
+                        Не напоминать
+                    </option>
+
+                    <option value="5">
+                        За 5 минут
+                    </option>
+
+                    <option value="10">
+                        За 10 минут
+                    </option>
+
+                    <option value="15">
+                        За 15 минут
+                    </option>
+
+            </select>
+
+            </label>
+
+
+            <label class="check-row">
+
+                <input
+                    type="checkbox"
+                    id="taskReminder"
+                >
+
+                Включить уведомление
+
+            </label>
+
+
+            <div class="modal-buttons">
+
+                <button type="submit">
+                    💾 Сохранить
+                </button>
+
+                <button
+                    type="button"
+                    id="deleteTaskButton"
+                    class="danger hidden"
+                >
+                    🗑 Удалить
+                </button>
+
+                <button
+                    type="button"
+                    id="deleteSeriesButton"
+                    class="danger hidden"
+                >
+                    🗑 Удалить всю серию
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ===============================
+     ТАЙМЕР
+================================ -->
+
+<div id="timerBox" class="timer-box hidden">
+
+    <span id="timerTaskName"></span>
+
+    <strong id="timerValue">
+        00:00:00
+    </strong>
+
+    <button id="stopTimer">
+        Остановить
+    </button>
+
+</div>
+
+
+<!-- ===============================
+     ЦЕЛИ
+================================ -->
+
+<div id="goalsModal" class="modal hidden">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>🎯 Мои цели</h2>
+
+            <button
+                onclick="closeWindow('goalsModal')"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="goalForm">
+
+            <input
+                id="goalTitle"
+                placeholder="Например: Решить 20 задач"
+                required
+            >
+
+            <input
+                id="goalTarget"
+                type="number"
+                min="1"
+                placeholder="Цель"
+                required
+            >
+
+            <button>
+                Добавить цель
+            </button>
+
+        </form>
+
+
+        <div id="goalsList"></div>
+
+    </div>
+
+</div>
+
+
+<!-- ===============================
+     МАТРИЦА
+================================ -->
+
+<div id="eisenhowerModal" class="modal hidden">
+
+    <div class="modal-content large">
+
+        <div class="modal-header">
+
+            <h2>🧩 Матрица Эйзенхауэра</h2>
+
+            <button
+                onclick="closeWindow('eisenhowerModal')"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="matrix">
+
+            <div class="matrix-cell urgent-important">
+
+                <h3>🔥 Срочно и важно</h3>
+
+                <div id="matrix1"></div>
+
+                <button onclick="addMatrixTask(1)">
+                    + Добавить
+                </button>
+
+            </div>
+
+
+            <div class="matrix-cell important">
+
+                <h3>🎯 Важно, но не срочно</h3>
+
+                <div id="matrix2"></div>
+
+                <button onclick="addMatrixTask(2)">
+                    + Добавить
+                </button>
+
+            </div>
+
+
+            <div class="matrix-cell urgent">
+
+                <h3>⚡ Срочно, но не важно</h3>
+
+                <div id="matrix3"></div>
+
+                <button onclick="addMatrixTask(3)">
+                    + Добавить
+                </button>
+
+            </div>
+
+
+            <div class="matrix-cell neither">
+
+                <h3>🗑 Не срочно и не важно</h3>
+
+                <div id="matrix4"></div>
+
+                <button onclick="addMatrixTask(4)">
+                    + Добавить
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ===============================
+     ЗАМЕТКИ
+================================ -->
+
+<div id="notesModal" class="modal hidden">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>📝 Заметки</h2>
+
+            <button
+                onclick="closeWindow('notesModal')"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <textarea
+            id="notesText"
+            class="big-notes"
+            placeholder="Запиши здесь свои мысли..."
+        ></textarea>
+
+
+        <button id="saveNotesButton">
+            💾 Сохранить
+        </button>
+
+    </div>
+
+</div>
+
+
+<!-- ===============================
+     СТАТИСТИКА
+================================ -->
+
+<div id="monthStatsModal" class="modal hidden">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>📊 Статистика месяца</h2>
+
+            <button
+                onclick="closeWindow('monthStatsModal')"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div id="monthStats"></div>
+
+    </div>
+
+</div>
+
+
+<script src="script.js"></script>
+
+</body>
+</html>
